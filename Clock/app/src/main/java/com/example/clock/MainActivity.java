@@ -19,6 +19,17 @@ public class MainActivity extends AppCompatActivity implements Tab1.OnFragmentIn
 
         TabLayout tabLayout = findViewById(R.id.tablayout);
         tabLayout.setupWithViewPager(vp);
+
+        int[] icons = {
+                R.drawable.alarm,
+                R.drawable.timer,
+                R.drawable.stopwatch
+        };
+
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            tabLayout.getTabAt(i).setIcon(icons[i]);
+        }
+
     }
 
     @Override
