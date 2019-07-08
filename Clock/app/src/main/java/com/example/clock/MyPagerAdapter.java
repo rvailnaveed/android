@@ -32,7 +32,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "ALARMS";
+                return "ALARM";
             case 1:
                 return "TIMER";
             case 2:
