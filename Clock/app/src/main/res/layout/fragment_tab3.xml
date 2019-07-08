@@ -10,21 +10,37 @@
     android:paddingTop="16dp">
 
     <ImageView
-        android:id="@+id/btn_capture_photo"
+        android:id="@+id/circle"
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:layout_gravity="center_horizontal|center_vertical"
         android:layout_marginBottom="70dp"
         android:src="@drawable/white_circle" />
 
+
+
+    <Chronometer
+        android:id="@+id/stopwatch"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:textSize="50sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_marginBottom="70dp"
+        android:layout_alignTop="@id/circle"
+        android:layout_alignBottom="@id/circle"
+        android:layout_alignLeft="@id/circle"
+        android:layout_alignRight="@id/circle"/>
+
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/start_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|center_vertical|bottom"
-        android:layout_marginBottom="16dp"
         android:clickable="true"
         app:backgroundTint="@color/light_blue"
+        android:layout_marginBottom="16dp"
         app:srcCompat="@drawable/play"
         android:focusable="true" />
 

@@ -8,11 +8,20 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -24,6 +33,12 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class Tab3 extends Fragment {
+
+    long MsTime, startTime, timeBuff, updateTime = 0L;
+    Handler handler;
+    int seconds, minutes, milliseconds;
+    boolean flag = true;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -70,7 +85,19 @@ public class Tab3 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_tab3, container, false);
+        View inf = inflater.inflate(R.layout.fragment_tab3, container, false);
+
+        FloatingActionButton start = inf.findViewById(R.id.start_btn);
+        final Chronometer stopwatch = inf.findViewById(R.id.stopwatch);
+
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopwatch.start();
+            }
+        });
+
+        return inf;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
