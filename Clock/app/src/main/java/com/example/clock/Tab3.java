@@ -19,6 +19,7 @@ import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,10 +35,8 @@ import android.widget.Toast;
  */
 public class Tab3 extends Fragment {
 
-    long MsTime, startTime, timeBuff, updateTime = 0L;
-    Handler handler;
-    int seconds, minutes, milliseconds;
-    boolean flag = true;
+    public static long timeWhenStopped = 0;
+    boolean started = false;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -87,17 +86,67 @@ public class Tab3 extends Fragment {
         // Inflate the layout for this fragment
         View inf = inflater.inflate(R.layout.fragment_tab3, container, false);
 
-        FloatingActionButton start = inf.findViewById(R.id.start_btn);
+        final FloatingActionButton start = inf.findViewById(R.id.start_btn);
+        final FloatingActionButton pause = inf.findViewById(R.id.pause_btn);
+        final Button reset = inf.findViewById(R.id.reset_btn);
+        final Button lap = inf.findViewById(R.id.lap_btn);
         final Chronometer stopwatch = inf.findViewById(R.id.stopwatch);
+        final long timeWhenStopped = 0;
+        pause.hide();
+        reset.setVisibility(View.GONE);
+        lap.setVisibility(View.GONE);
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                start.hide();
+                pause.show();
+                reset.setVisibility(View.VISIBLE);
+                lap.setVisibility(View.VISIBLE);
+                if(started == false){
+                    started = true;
+                    stopwatch.setBase(SystemClock.elapsedRealtime());
+                }
+                stopwatch.setBase(SystemClock.elapsedRealtime() + getTimeWhenStopped());
                 stopwatch.start();
             }
         });
 
+        pause.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                pause.hide();
+                start.show();
+                //timeWhenStopped = stopwatch.getBase() - SystemClock.elapsedRealtime();
+                setTimeWhenStopped(stopwatch.getBase(), SystemClock.elapsedRealtime());
+                stopwatch.stop();
+            }
+
+        });
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                started = false;
+                stopwatch.setBase(SystemClock.elapsedRealtime());
+                stopwatch.stop();
+                setTimeWhenStopped(2, 2);
+                reset.setVisibility(View.GONE);
+                lap.setVisibility(View.GONE);
+                pause.hide();
+                start.show();
+            }
+        });
+
         return inf;
+    }
+
+    public long getTimeWhenStopped(){
+        return timeWhenStopped;
+    }
+
+    public void setTimeWhenStopped(long base, long ellapsedTime){
+        timeWhenStopped = base - ellapsedTime;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
