@@ -91,7 +91,6 @@ public class Tab3 extends Fragment {
         final Button reset = inf.findViewById(R.id.reset_btn);
         final Button lap = inf.findViewById(R.id.lap_btn);
         final Chronometer stopwatch = inf.findViewById(R.id.stopwatch);
-        final long timeWhenStopped = 0;
         pause.hide();
         reset.setVisibility(View.GONE);
         lap.setVisibility(View.GONE);
