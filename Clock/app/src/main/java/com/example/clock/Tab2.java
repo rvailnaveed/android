@@ -8,10 +8,13 @@ import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -25,10 +28,12 @@ import java.util.Locale;
  * create an instance of this fragment.
  */
 public class Tab2 extends Fragment {
-    private static final long START_TIME_MILLIS = 600000;
+    private EditText inputTime;
+    private long startTimeInMillis;
     private long timeLeftInMills;
     private TextView timer_text;
     private Button reset;
+    private  FloatingActionButton start2;
     private FloatingActionButton start;
     private FloatingActionButton pause;
     private CountDownTimer countdownTimer;
@@ -82,18 +87,44 @@ public class Tab2 extends Fragment {
                              Bundle savedInstanceState) {
         View inf = inflater.inflate(R.layout.fragment_tab2, container, false);
         start = inf.findViewById(R.id.timer_start);
+        start2 = inf.findViewById(R.id.start2);
         pause = inf.findViewById(R.id.timer_pause);
         reset = inf.findViewById(R.id.reset_btn);
         timer_text = inf.findViewById(R.id.timer_text);
+        inputTime = inf.findViewById(R.id.input);
 
-   //     start.hide();
+        start.hide();
+        start2.hide();
         pause.hide();
         reset.setVisibility(View.INVISIBLE);
+
+        inputTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    start.show();
+                    return;
+                } else {
+                    start.hide();
+                }
+            }
+        });
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startTimer();
+                String input = inputTime.getText().toString();
+                if(input.length() == 0) {
+                    Toast.makeText(getActivity(), "Enter a number", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                long millisInput = Long.parseLong(input) * 60000;
+                if(millisInput == 0) {
+                    Toast.makeText(getActivity(), "Enter positive number", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                startTimer(millisInput);
+                inputTime.setText("");
             }
         });
 
@@ -107,11 +138,13 @@ public class Tab2 extends Fragment {
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                reset.setVisibility(View.INVISIBLE);
+                pause.hide();
                 resetTimer();
             }
         });
 
-       // updateTimerText();
+        updateTimerText();
 
         return inf;
     }
@@ -139,12 +172,15 @@ public class Tab2 extends Fragment {
         super.onDetach();
         mListener = null;
     }
+    
 
-
-    private void startTimer() {
+    private void startTimer(long milliseconds) {
         start.hide();
         pause.show();
         reset.setVisibility(View.VISIBLE);
+
+        startTimeInMillis = milliseconds;
+        resetTimer();
 
         endTime = System.currentTimeMillis() + timeLeftInMills;
         countdownTimer = new CountDownTimer(timeLeftInMills, 1000) {
@@ -166,63 +202,76 @@ public class Tab2 extends Fragment {
         countdownTimer.cancel();
         timerRunning = false;
         pause.hide();
-        start.show();
+        start2.show();
     }
 
     private void resetTimer(){
-        timeLeftInMills = START_TIME_MILLIS;
-        countdownTimer.cancel();
+        timeLeftInMills = startTimeInMillis;
+     //   countdownTimer.cancel();
         updateTimerText();
         start.show();
-        pause.hide();
-        reset.setVisibility(View.INVISIBLE);
+     //   pause.hide();
+        //reset.setVisibility(View.INVISIBLE);
     }
 
     private void updateTimerText(){
-        int minutes = (int) timeLeftInMills / 1000 / 60;
+        int hours = (int) timeLeftInMills / 1000 / 3600;
+        int minutes = (int) ((timeLeftInMills / 1000) % 3600) / 60;
         int seconds = (int) timeLeftInMills / 1000 % 60;
-        String timeLeft = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+        String timeLeft;
+        if(hours > 0) {
+            timeLeft = String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, seconds);
+        } else {
+            timeLeft = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+        }
         timer_text.setText(timeLeft);
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        SharedPreferences prefs = this.getActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE);
-
-        timeLeftInMills = prefs.getLong("millisLeft", START_TIME_MILLIS);
-        timerRunning = prefs.getBoolean("timerRunning", false);
-        updateTimerText();
-
-        if (timerRunning) {
-            endTime = prefs.getLong("endTime", 0);
-            timeLeftInMills = endTime - System.currentTimeMillis();
-
-            if (timeLeftInMills < 0){
-                timeLeftInMills = 0;
-                timerRunning = false;
-                updateTimerText();
-            } else {
-                startTimer();
-            }
-        }
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        SharedPreferences prefs = this.getActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong("millisLeft", timeLeftInMills);
-        editor.putBoolean("timerRunning", timerRunning);
-        //editor.putLong("endTime", endTime);
-
-        editor.apply();
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//
+//        SharedPreferences prefs = this.getActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+//
+//        startTimeInMillis = prefs.getLong("startTimeInMillis", 0);
+//        timeLeftInMills = prefs.getLong("millisLeft", timeLeftInMills);
+//        timerRunning = prefs.getBoolean("timerRunning", false);
+//        updateTimerText();
+//
+//        if (timerRunning) {
+//            endTime = prefs.getLong("endTime", 0);
+//            timeLeftInMills = endTime - System.currentTimeMillis();
+//
+//            if (timeLeftInMills < 0){
+//                timeLeftInMills = 0;
+//                timerRunning = false;
+//                updateTimerText();
+//            } else {
+//                startTimer(timeLeftInMills);
+//            }
+//        }
+//
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//
+//        SharedPreferences prefs = this.getActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = prefs.edit();
+//
+//        editor.putLong("startTimeInMillis", startTimeInMillis);
+//        editor.putLong("millisLeft", timeLeftInMills);
+//        editor.putBoolean("timerRunning", timerRunning);
+//        editor.putLong("endTime", endTime);
+//
+//        editor.apply();
+//
+//        if(countdownTimer != null) {
+//            countdownTimer.cancel();
+//        }
+//    }
 
     /**
      * This interface must be implemented by activities that contain this
